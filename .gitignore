@@ -1,0 +1,38 @@
+# Local .terraform directories
+.terraform/
+# Ignore lockfile from TF 0.14+
+.terraform.lock.hcl
+# .tfstate files
+*.tfstate
+*.tfstate.*
+# log files
+*.log
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# Exclude test output from validation checks, keep sample .tfvars files
+!validation/**/*.tfvars
+validation/*.tfplan
+validation/*.txt
+
+# credential files
+*credentials.json
+*credentials*.json
+
+# Kitchen directories
+terraform.tfstate.d/*
+.kitchen/
+
+# vscode
+.vscode/
+
+# IntelliJ
+*.iml
+/.idea
+
+# local development folders
+secrets
+config
