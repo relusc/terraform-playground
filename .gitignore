@@ -22,10 +22,6 @@ validation/*.txt
 *credentials.json
 *credentials*.json
 
-# Kitchen directories
-terraform.tfstate.d/*
-.kitchen/
-
 # vscode
 .vscode/
 
