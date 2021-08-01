@@ -3,16 +3,11 @@ variable "project_id" {
   type        = string
 }
 
-variable "network_name" {
-  description = "Name of the created VPC"
-  type        = string
-}
-
-variable "subnets" {
-  description = "All subnets of the VPC"
+variable "bucket_configs" {
+  description = "GCS buckets to create"
   type = map(object({
-    name   = string
-    region = string
-    cidr   = string
+    location           = string
+    versioning         = bool
+    num_newer_versions = string
   }))
 }

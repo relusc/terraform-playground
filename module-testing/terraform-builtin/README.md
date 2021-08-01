@@ -4,13 +4,12 @@ This folder describes integration testing a Terraform module with the builtin `t
 
 ## Module setup
 
-The example Terraform module itself creates a simple GCP VPC network and a variable amount of associated subnetworks (see [`main.tf`](./main.tf)). Following values need to be submitted via Terraform input variables (see [`variables.tf`](./variables.tf)):
+The example Terraform module itself creates simple GCS buckets (see [`main.tf`](./main.tf)). Following values need to be submitted via Terraform input variables (see [`variables.tf`](./variables.tf)):
 
 - `project_id`: GCP project in which the instance will be created
-- `network_name`: The name of the VPC network
-- `subnets`: The subnetworks, each having a name, region and associated CIDR range
+- `bucket_configs`: All buckets that will be created with different config parameters
 
-The module outputs the created VPC network, see [`outputs.tf`](./outputs.tf).
+The module outputs the created GCS buckets, see [`outputs.tf`](./outputs.tf).
 
 ## Test setup
 
@@ -21,4 +20,4 @@ All test suites have to reside in own subfolders, in this case the [`basic`](./t
 ## Test execution
 
 1. Be sure to be on the root level of this example module
-2. Run `terraform test`. That's it
+2. Run `terraform test`. That's it!

@@ -12,54 +12,71 @@ terraform {
 }
 
 locals {
-  project_id   = "myproject"
-  network_name = "test-vpc"
-  subnets = {
-    "sub-ew1" = {
-      name   = "sub-ew1"
-      region = "europe-west1"
-      cidr   = "10.1.0.0/20"
+  project_id = "myproject"
+  bucket_configs = {
+    "gcs-vers-ew1" = {
+      location           = "europe-west1"
+      versioning         = true
+      num_newer_versions = 5
     },
-    "sub-ew4" = {
-      name   = "sub-ew4"
-      region = "europe-west4"
-      cidr   = "10.3.0.0/20"
+    "gcs-novers-ew4" = {
+      location           = "europe-west4"
+      versioning         = false
+      num_newer_versions = 0 # Will be ignored anyway
     },
   }
 }
 
-module "network" {
+module "gcs" {
   # Path to the module to test
-  source       = "../.."
-  project_id   = local.project_id
-  network_name = local.network_name
-  subnets      = local.subnets
-}
-
-# Use data resource to check if VPC network exists
-data "google_compute_network" "this" {
-  project = local.project_id
-  name    = module.network.network.name
-
-  depends_on = [
-    module.network
-  ]
+  source         = "../.."
+  project_id     = local.project_id
+  bucket_configs = local.bucket_configs
 }
 
 # Use special resource test_assertions provided by built-in test provider
-resource "test_assertions" "vpc_check" {
+resource "test_assertions" "bucket_check_versioning" {
   # component gives an unique identifier for the assertions
-  component = "vpc_check"
+  component = "bucket_check_versioning"
 
   equal "name" {
-    description = "VPC name check"
-    got         = data.google_compute_network.this.name
-    want        = "test-vpc"
+    description = "Name check for ew1 bucket with versioning enabled"
+    got         = module.gcs.buckets["gcs-vers-ew1"].name
+    want        = "gcs-vers-ew1"
   }
 
-  equal "amount_of_subnets" {
-    description = "VPC check amount of subnets"
-    got         = length(data.google_compute_network.this.subnetworks_self_links)
-    want        = length(local.subnets)
+  equal "versioning_enabled" {
+    description = "Check ew1 bucket if versioning is enabled"
+    got         = module.gcs.buckets["gcs-vers-ew1"].versioning[0].enabled
+    want        = true
+  }
+
+  equal "num_newer_versions" {
+    description = "Check ew1 bucket if num_newer_version is set correctly"
+    got         = tolist(module.gcs.buckets["gcs-vers-ew1"].lifecycle_rule[0].condition)[0].num_newer_versions
+    want        = 5
+  }
+}
+
+resource "test_assertions" "bucket_check_versioning_disabled" {
+  # component gives an unique identifier for the assertions
+  component = "bucket_check_versioning_disabled"
+
+  equal "name" {
+    description = "Name check for ew4 bucket with versioning disabled"
+    got         = module.gcs.buckets["gcs-novers-ew4"].name
+    want        = "gcs-novers-ew4"
+  }
+
+  equal "versioning_disabled" {
+    description = "Check ew1 bucket if versioning is disabled"
+    got         = module.gcs.buckets["gcs-novers-ew4"].versioning[0].enabled
+    want        = false
+  }
+
+  equal "location" {
+    description = "Check we4 bucket location"
+    got         = module.gcs.buckets["gcs-novers-ew4"].location
+    want        = "EUROPE-WEST4" # Location is somehow capizalized on GCP API side
   }
 }
