@@ -39,7 +39,6 @@ func TestTerraformSetupInstance(t *testing.T) {
 
 	// Get outputs
 	instanceName := terraform.Output(t, terraformOptions, "instance_name")
-	// svcAccEmail := terraform.Output(t, terraformOptions, "svc_acc_email")
 
 	err = initGCPClient()
 	if err != nil {
@@ -55,11 +54,4 @@ func TestTerraformSetupInstance(t *testing.T) {
 	assert.Equal(t, instanceName, instance.Name)
 	assert.Equal(t, fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%s/zones/%s", project, zone), instance.Zone)
 	assert.Equal(t, fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%s/zones/%s/machineTypes/%s", project, zone, machineType), instance.MachineType)
-
-	// svc, err := getServiceAccount(project, svcAccEmail)
-	// if err != nil {
-	// 	t.Fatalf("error while getting service account: %s", err)
-	// }
-
-	// assert.Equal(t, svcAccEmail, svc.Email)
 }
